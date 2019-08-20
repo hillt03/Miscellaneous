@@ -40,7 +40,6 @@ class PyEZBackup:
             if os.path.isfile(filepath):
                 copy_file(filepath, self.backup_location)
             elif os.path.isdir(filepath):
-                # self.copytree(filepath, self.backup_location)
                 self.copytree(filepath, self.backup_location)
             else:
                 print(f"Invalid filepath: {filepath}")
