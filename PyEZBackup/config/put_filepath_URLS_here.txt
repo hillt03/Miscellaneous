@@ -1,3 +1,1 @@
-C:\Users\noiz\Desktop\PyTest\MiscScripts\PyEZBackup\unit_tests_data\back_me_up
-C:\Users\noiz\Desktop\PyTest\MiscScripts\PyEZBackup\unit_tests_data\back_me_up_2
-notes.txt
+Remove this line and enter filepaths here on a newline
