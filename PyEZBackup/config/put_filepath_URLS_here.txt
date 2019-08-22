@@ -1,1 +1,7 @@
-Remove this line and enter filepaths here on a newline
+This is where you put the URLs you want to make a backup of.
+Remove everything here and enter filepaths separated by a newline
+Example:
+C:\Users\user\Destkop\Files
+C:\Users\user\Documents
+C:\Users\user\Destkop\notes.txt
+etc..
