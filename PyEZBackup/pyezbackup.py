@@ -6,10 +6,12 @@ import sys
 
 
 class PyEZBackup:
-    def __init__(self, filepath_file, backup_location):
+    def __init__(self, filepath_file, excluded_filepath_file, backup_location):
         self.filepath_list = [] # Stores filepaths that will be backed up
+        self.excluded_filepath_list = [] # Stores filepaths that will not be backed up, useful when using a wildcard
         self.filenames = []  # Excludes path apart from filename
         self.filepath_file = filepath_file # Path to the file containing filepaths to backup
+        self.excluded_filepath_file = excluded_filepath_file # Path to the file containing filepaths that won't be backed up
         self.backup_location = backup_location # Path to where folders/files will be backed up
         self.main_dir = os.getcwd() # Stores PyEZBackup location
         if not os.path.exists(self.backup_location):
@@ -21,8 +23,9 @@ class PyEZBackup:
         """
         with open(self.filepath_file, "r") as filepath_txt:
             self.filepath_list = filepath_txt.read().splitlines()
+
         print("=============================================")
-        print("Filepath backup list:")
+        print("Filepath backup list\n-------------")
         for file in self.filepath_list:
             if "." in file:
                 if "*" in file: # Check for wildcard paths
@@ -35,14 +38,42 @@ class PyEZBackup:
         if not self.filepath_list:
             print("Empty filepath list.")
             sys.exit(0)
+        self._read_excluded_filepaths()
         for file in self.filepath_list:
             self.filenames.append(self.get_filename(file))
         return self.filepath_list
+
+    def _read_excluded_filepaths(self):
+        """
+        Updates self.excluded_filepath_list with excluded filepaths.
+        Updates self.filepath_list by removing excluded filepaths.
+        """
+        with open(self.excluded_filepath_file, "r") as excluded_filepath_txt:
+            self.excluded_filepath_list = excluded_filepath_txt.read().splitlines()
+
+        print("Excluded filepaths\n-------------")
+        if not self.excluded_filepath_list:
+            print("INFO: No excluded filepaths.")
+            print("=============================================")
+        else:
+            for file in self.excluded_filepath_list:
+                print(file)
+            print("=============================================")
+            print("Files excluded\n-------------")
+
+
+            for file in self.excluded_filepath_list:
+                if file in self.filepath_list:
+                    self.filepath_list.remove(file)
+                    print(self.get_filename(file))
+            print("=============================================")
+
 
     def backup_filepaths(self):
         """
         Backs up each file in self.filepath_list to self.backup_location.
         """
+        print("Backup progress\n-------------")
         for filepath in self.filepath_list:
             print("Backing up " + self.get_filename(filepath))
             if os.path.isfile(filepath):
@@ -84,8 +115,8 @@ class PyEZBackup:
         """
         Ensures backup completed successfully.
         """
-        print("---------------------------------------------")
-        print("Backup results:")
+        print("=============================================")
+        print("Backup results\n-------------")
         os.chdir(self.backup_location)
         backup_list = os.listdir()
         backup_failed = False
@@ -95,7 +126,7 @@ class PyEZBackup:
                 backup_failed = True
         if not backup_failed:
             print("Backup successful.")
-        print("---------------------------------------------")
+        print("=============================================")
         os.chdir(self.main_dir)
 
 
@@ -106,7 +137,7 @@ def main():
         "--filepath_file",
         metavar="",
         type=str,
-        help="Specify path to the text file that contains filepaths which will be backed up.",
+        help="Specify path to the .txt containing filepaths that will be backed up. (Default: config/put_filepath_URLS_here.txt)",
     )
     parser.add_argument(
         "-b",
@@ -114,6 +145,13 @@ def main():
         metavar="",
         type=str,
         help="Specify folder where files will be backed up. The folder will be created if it doesn't exist.",
+    )
+    parser.add_argument(
+        "-e",
+        "--excluded_filepath_file",
+        metavar="",
+        type=str,
+        help="Specify path to .txt containing filepaths that won't be backed up. (Default: config/excluded_filepaths.txt)",
     )
     args = parser.parse_args()
     filepath_file = (
@@ -124,9 +162,14 @@ def main():
     backup_location = (
         args.backup_location if args.backup_location is not None else "backup"
     )
-    test = PyEZBackup(filepath_file=filepath_file, backup_location=backup_location)
-    test.read_filepaths()
-    test.backup_filepaths()
+    excluded_filepath_file = (
+        args.excluded_filepath_file
+        if args.excluded_filepath_file is not None
+        else "config/excluded_filepaths.txt"
+    )
+    backup = PyEZBackup(filepath_file=filepath_file, backup_location=backup_location, excluded_filepath_file=excluded_filepath_file)
+    backup.read_filepaths()
+    backup.backup_filepaths()
 
 
 if __name__ == "__main__":
