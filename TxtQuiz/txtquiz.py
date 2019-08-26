@@ -14,6 +14,7 @@ if __name__ == "__main__":
     chapters_and_number_of_questions = {}
     custom_chapter_numbers_list = [] # Used if there's not a different amount of questions
     custom_chapter_numbers_dict = {} # Contains chapter number as key and number of questions as value
+    finishers = ['x', 'q', 'quit', 'close']
 
     if ask("Would you like to separate the questions into chapters? (Yes/No):"):
         chapters_in_use = True
@@ -49,7 +50,7 @@ if __name__ == "__main__":
                 while adding_chapters:
                     print("========")
                     chapter_number = input("Chapter number: ")
-                    if chapter_number == "x":
+                    if chapter_number in finishers:
                         adding_chapters = False
                         break
                     questions_in_chapter = input("Questions in chapter: ")
